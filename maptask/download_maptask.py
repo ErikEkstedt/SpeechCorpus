@@ -63,14 +63,17 @@ def download_audio(audio_path, url=None):
     # system(f'rm {join(audio_path, "q6ec2.mix.wav")}')
 
 
-def resample(audio_path, sr=16000, bitrate=16):
+def resample(audio_path, sr=16000, bitrate=16, remove=True):
     for filename in tqdm(listdir(audio_path)):
         if filename.endswith(".wav"):
             fpath = join(audio_path, filename)
             to_path = join(audio_path, filename.replace(".mix", ""))
+            if fpath == to_path:
+                to_path = to_path.replace(".wav", "_resampled.wav")
             cmd = ["sox", fpath, "-b", str(bitrate), "-r", str(sr), to_path]
             system(" ".join(cmd))
-            system(f"rm {fpath}")
+            if remove:
+                system(f"rm {fpath}")
 
 
 def ffmpeg_split(filename, split_path, session):
@@ -140,7 +143,7 @@ if __name__ == "__main__":
     if ans.lower() == "y":
         download_annotation(args.savepath)
 
-    audio_path = join(args.savepath, "audio_stereo")
+    audio_path = join(args.savepath, "audio")
     print("Download audio? (y/n)")
     ans = input()
     if ans.lower() == "y":
@@ -149,7 +152,12 @@ if __name__ == "__main__":
     print("Resample audio? (y/n)")
     ans = input()
     if ans.lower() == "y":
-        resample(audio_path, sr=args.samplerate, bitrate=args.bitrate)
+        remove = True
+        print("Keep original files? (y/n)")
+        ans = input()
+        if ans.lower() == "y":
+            remove = False
+        resample(audio_path, sr=args.samplerate, bitrate=args.bitrate, remove=remove)
 
     split_path = join(args.savepath, "audio_mono")
     print("Stereo -> Mono? (y/n)")
