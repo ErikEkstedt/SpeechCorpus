@@ -8,8 +8,14 @@ Go to https://catalog.ldc.upenn.edu/LDC97S62 for further information.
 """
 
 
-def download(datapath, url):
-    tar_path = join(datapath, "switchboard_word_alignments.tar.gz")
+def download(datapath, treebank=True):
+    if treebank:
+        url = "https://www.isip.piconepress.com/projects/switchboard/releases/ptree_word_alignments.tar.gz"
+    else:
+        url = "https://www.isip.piconepress.com/projects/switchboard/releases/switchboard_icsi_phone.tar.gz"
+
+    name = basename(url)
+    tar_path = join(datapath, name)
 
     print("Downloading annotations")
     if not exists(tar_path):
@@ -17,7 +23,7 @@ def download(datapath, url):
         system(" ".join(wget_cmd))
 
     print("Extracting")
-    system(f"tar xjf {tar_path} -C {datapath}")
+    system(f"tar xzf {tar_path} -C {datapath}")
 
     print("Remove {tar_path}? (y/n)")
     ans = input()
@@ -30,8 +36,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Process Switchboard Audio")
-    parser.add_argument("--url", default=None)
     parser.add_argument("--path", default="data")
     args = parser.parse_args()
 
-    download(args.path, args.url)
+    download(args.path)
