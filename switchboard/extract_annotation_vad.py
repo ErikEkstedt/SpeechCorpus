@@ -2,6 +2,7 @@ from os.path import join, abspath, exists
 from os import makedirs, listdir
 from utils import get_duration_sox, read_txt
 from glob import glob
+from tqdm import tqdm
 import numpy as np
 
 
@@ -54,7 +55,7 @@ def save_switchboard_vad_treebank(audio_path, anno_path, save_path):
 
     skip = []
     wav_files = [f for f in listdir(audio_path) if f.endswith(".wav")]
-    for wav in wav_files:
+    for wav in tqdm(wav_files):
         name = wav.strip(".wav").replace("sw0", "sw")
         anno = [f for f in anno_paths if name in f]
         anno.sort()
