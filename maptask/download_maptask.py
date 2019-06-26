@@ -29,9 +29,7 @@ def download_annotation(savepath, url=None):
         savepath,
     ]
     system(" ".join(unzip_cmd))
-    system(
-        f'mv {join(savepath, "maptaskv2-1")} {join(savepath, "maptask_annotations")}'
-    )
+    system(f'mv {join(savepath, "maptaskv2-1")} {join(savepath, "annotations")}')
     system(f'rm {join(savepath, "hcrcmaptask.nxtformatv2-1.zip")}')
 
 
