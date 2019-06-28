@@ -1,7 +1,7 @@
 from os.path import join
 from os import listdir
 import numpy as np
-from utils import write_txt
+from speechcorpus.utils import write_txt
 
 """
 As of now just randomly creates a test/train set.

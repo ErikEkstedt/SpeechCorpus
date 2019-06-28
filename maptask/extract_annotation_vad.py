@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 import numpy as np
 from tqdm import tqdm
 
-from utils import get_duration_sox
+from speechcorpus.utils import get_duration_sox
 
 
 """

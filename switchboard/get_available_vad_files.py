@@ -1,6 +1,6 @@
 from os.path import join, basename
 from glob import glob
-from utils import write_txt
+from speechcorpus.utils import write_txt
 
 
 def get_available_treebank():

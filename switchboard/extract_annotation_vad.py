@@ -1,6 +1,6 @@
 from os.path import join, abspath, exists, basename
 from os import makedirs, listdir
-from utils import get_duration_sox, read_txt
+from speechcorpus.utils import get_duration_sox, read_txt
 from tqdm import tqdm
 from glob import glob
 import numpy as np
