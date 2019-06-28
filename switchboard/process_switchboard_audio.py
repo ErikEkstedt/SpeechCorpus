@@ -19,9 +19,14 @@ def resample_audio(audio_path, savepath=None, sr=16000, bitrate=16):
             makedirs(savepath)
         for fpath in tqdm(files):
             if savepath is None:
-                fpath_wav = join(audio_path, fpath.replace(".sph", ".wav"))
+                fpath_wav = join(
+                    audio_path, fpath.replace(".sph", ".wav").replace("sw0", "sw")
+                )
             else:
-                fpath_wav = join(savepath, basename(fpath).replace(".sph", ".wav"))
+                fpath_wav = join(
+                    savepath,
+                    basename(fpath).replace(".sph", ".wav").replace("sw0", "sw"),
+                )
             cmd = ["sox", fpath, "-r", str(sr), "-b", str(bitrate), fpath_wav]
             system(" ".join(cmd))
 
