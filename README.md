@@ -2,6 +2,8 @@
 
 A repository for multiple spoken dialog corpora:
 
+[Open Speech & Language Resources](https://www.openslr.org/resources.php)
+
 ##  Installation
 
 * create python environment (Conda is recommended)

@@ -1,5 +1,6 @@
 data/
 /data/
+.vector_cache/
 
 __pycache__/
 *.egg-info/

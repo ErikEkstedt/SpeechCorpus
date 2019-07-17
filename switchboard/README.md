@@ -44,11 +44,6 @@ SpeechCorpus
 
 ------
 
-* (Create python env)
-* Install dependencies `pip install -r requirements.txt`
-* Source environment
-
-
 1. Download the audio and save it into $SpeechCorpus/switchboard/data
 2. Download the annotations by running `python download_switchboard.py`
     - [Manually corrected word alignments](https://www.isip.piconepress.com/projects/switchboard/releases/switchboard_word_alignments.tar.gz)
@@ -57,18 +52,5 @@ SpeechCorpus
     - default: `.sph - 8bit - 8kHz -> .wav, 16bit, 16kHz`
     - savepath: `data/audio`
     - NOTE! the upsampled wav files tak up ~56Gb
-
-
-## Annotations
-
-#### Penn Treebank Transcriptions (11/26/02) 
-
-"Download the Penn Treebank Transcriptions: This release contains a few bug
-fixes in the 10/19/02 release, reflecting changes described above in the word alignments
-and segmentations. This Penn Treebank release contains an alignment of the ISIP
-hand-aligned word transcriptions to the Penn Treebank word transcriptions for all **1126** SWB
-conversations that are included in the Treebank. For the words which are in agreement
-between the two transcriptions, time marks are given. For words that do not agree, we
-estimate the times for the Treebank transcriptions using the ISIP transcriptions. The
-transcriptions also include all instances of silence, laughter and noise." - website
-
+4. [get_word_counter.py](./get_word_counter.py) counts the words in the corpus (used for
+   building vocab)
