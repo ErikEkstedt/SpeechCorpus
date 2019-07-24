@@ -128,3 +128,104 @@ C = Contrast; M = Match; ID = Campus Interface(?) ID
 | 5-8 | 1,2,5,6	| Familiar |
 | 5-8 | 3,4,7,8	| Unfamiliar |
 
+## Part-Of-Speech (POS) tags
+
+The part-of-speech tag set used is a modified version of the Brown Corpus tag set. Further details can be found in this postscript description of the tag set.
+
+MAIN VERBS
+VB	VERB BASE FORM
+VBD	VERB PAST FINITE FORM eg saw, looked, went
+VBG	VERB PRESENT PARTICIPLE (-ing) FORM
+VBN	VERB PAST PARTICIPLE eg burnt, gone
+VBZ	VERB 3rd PERSON SINGULAR FORM (+s)
+
+NOUNS
+NN	COMMON NOUN SINGULAR OR MASS
+NNS	COMMON NOUN PLURAL
+NP	PROPER NOUN SINGULAR
+
+ADJECTIVES
+JJ	ADJECTIVES
+JJR	COMPARATIVE ADJECTIVE
+JJT	SUPERLATIVE ADJECTIVE with or without -est morphology
+
+ADVERBS
+QL	QUALIFIER ADVERB - premodifies adjective or adverbial particles, prepositional adverbs or prepositions
+QLDT	QUALIFIER ADVERB - premodifies pronouns or determiners
+QLP	enough - when it postmodifies JJ or RB
+RB	ADVERB
+RBR	COMPARATIVE ADVERBS +ER
+WQL	how (as qualifier as in 'how many')
+WRB	how, when, whenever, where, whereabout, whereabouts, why
+NOT	not
+
+AUX VERBS
+TO	to (as verbal particle)
+forms of the verb "be"
+BE	be
+BEM	am, +'m, was
+BER	are, +'re, were
+BEZ	is, +'s, was
+forms of the verb "do"
+DO	do, did
+DOZ	does, did
+forms of the verb" have"
+HV	have, +'ve, had
+HVZ	has, +'s, had
+
+modal verbs
+MD	MODAL +'d, +'ll, can, could, may, might, must, need, ought, shall, should, will, would PLUS negative forms of the above
+
+DETERMINERS
+predeterminers (can occur before a CENTRAL DETERMINER)
+DPR	all, both, double, half, just, quarter, quite, such
+central determiners
+AT	ARTICLES: a, an, no, the
+DT	SING DEMONSTRATIVE: another, each, that, this
+QUANTIFIERS: any, some, either
+PLUR DEMONSTRATIVE: these, those
+PPG	POSSESSIVES: her, his, its, my, our, their, your
+WDT	INTERROGATIVE: what, which
+post determiners (can appear after a central determiner)
+AP	few, further, final, last, least, less, little, many, more, most, much, next, only, other, same, single, very
+CD	CARDINAL NUMBERS e.g. one, two, three, etc
+OD	ORDINAL NUMBER e.g. first, second, third
+GEN	+'s Genitive clitic
+
+PRONOUNS
+EX	there (existential subject)
+PD	DEMONSTRATIVE: this, that, these, those
+WPS	INTERROGATIVE SUBJ: who, what, whatever, which
+WPO	INTERROGATIVE OBJ: who, what, whatever, which
+PPS	PERSONAL SUBJECT 3RD SING: he, she, it
+PPSS	PERSONAL SUBJECT NON-3RD SING: I, we, you, they
+PPO	PERSONAL OBJECT: it, us, you, me, him, her, +'s, them
+PPL	PERSONAL REFL: herself, himself, itself, myself, yourself, ourselves, yourselves, themselves
+PPG2"	PERSONAL POSS: hers, his, mine, mines, ours, theirs, yours
+PR	RELATIVE: who, which, that
+PN	OTHER PRONOUNS: any, anything, anywhere(pro-pp?) everything, everywhere none, nothing, nowhere, neither some, something, somewhere 'them both', both, all, one
+RECIPROCAL:'each other' occurs twice - treat as a single token enough, ordinal numbers
+PREPOSITIONS
+IN	PREPOSITIONS (which take NP as complement)
+RP	either ADVERBIAL PREPOSITIONS (prepositions which take NO complement) or VERBAL PARTICLES (prepositions which form part of verbs) also included here are some uses of directions e.g. north
+
+CONJUNCTIONS
+CC	and, but, either, neither, nor, or, though, yet
+CS	'cause, 'til, after, as, because, before, if, like, once, since so, than, that, though, unless, until, whereas, whether, while
+
+INTERJECTIONS
+AFF	POSITIVE: right, okay, okey-dokey, mmhmm, uh-huh, yeah, yes, aye, fine, correct, rightee-ho, right-o, mm-mm, uh-uh
+NEUTRAL: now, well
+NEGATIVE: no, nope
+
+What Quirk et. al call reaction signals/initiators
+FP	FILLED PAUSE: eh, ehm, er, erm, hmm, mm, uh, um
+
+INTERJECTION: ah, aha, oh, bang, christ, dear, fine, god, gosh, ha, hell, hurrah, jeez, jesus, my, och, oo, oops, phew, please, say, smashing, sorry, splat, super, ugh, whoa, whoops, why, wow
+now also includes what used to be FW (FOREIGN WORD): alles, culpa, es, fini, finito, gemacht, mea, tu, verstanden
+NOI	other NOISEs made by the speaker: &noise, &laugh, &indecipherablespeech
+PAU	PAUSE: ...
+FRAG	FRAGMENTED WORDS (aborted words)
+
+PUNCTUATION
+SENT	TAGGING UNIT SEPARATOR -- NOT IN LEXICON --
