@@ -30,3 +30,13 @@ def get_duration_sox(fpath):
             hh, mm, ss = duration
             total = int(hh) * 60 * 60 + int(mm) * 60 + float(ss)
     return total
+
+
+def get_sample_rate_sox(fpath):
+    out = (
+        check_output(f"sox --i {fpath}", shell=True).decode("utf-8").strip().split("\n")
+    )
+    for line in out:
+        if line.lower().startswith("sample rate"):
+            l = [f for f in line.split(" ") if not f == ""]
+            return int(l[-1])
