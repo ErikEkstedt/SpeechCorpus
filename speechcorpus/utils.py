@@ -1,4 +1,16 @@
 from subprocess import check_output
+from scipy.io.wavfile import read
+import numpy as np
+
+
+def read_wav(path, norm=False):
+    sr, y = read(path)
+    y = y.astype(np.float32)
+    y /= 2 ** 15
+    y = y.astype(np.float32)
+    if norm:
+        y /= np.abs(y).max()
+    return y, sr
 
 
 def read_txt(filename):
