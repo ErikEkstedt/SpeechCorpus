@@ -35,8 +35,9 @@ def save_all_vads(datapath, savepath):
             if cont:
                 continue
             else:
-                name = "_".join(dirpath.split("/")[-2:]) + "_vad.npy"
-                filename = join(savepath, name)
+                fpath = join(savepath, "_".join(dirpath.split("/")[-2:]))
+                makedirs(fpath, exist_ok=True)
+                filename = join(fpath, "vad.npy")
                 wav_path = [
                     f
                     for f in files
@@ -46,6 +47,7 @@ def save_all_vads(datapath, savepath):
                 xml_path = [f for f in files if f.endswith(".xml")][0]
                 xml_path = join(dirpath, xml_path)
                 vad = get_vad(xml_path, wav_path)
+
                 np.save(filename, vad, allow_pickle=True)
 
 
@@ -74,22 +76,32 @@ def move_wavs(datapath, savepath):
 
 if __name__ == "__main__":
 
-    print("Processing training_set")
-    path = join(expanduser("~"), "SpeechCorpus/Robot/data/training_set")
-    savepath = join(expanduser("~"), "SpeechCorpus/Robot/data/training_set/vad")
-    save_all_vads(path, savepath)
+    ans = input("Process Train? (y/n)")
+    if ans.lower() == "y":
+        print("Processing training_set")
+        path = join(expanduser("~"), "SpeechCorpus/Robot/data/training_set")
+        savepath = join(expanduser("~"), "SpeechCorpus/Robot/data/training_set/vad")
+        save_all_vads(path, savepath)
 
-    savepath = join(expanduser("~"), "SpeechCorpus/Robot/data/training_set/audio")
-    move_wavs(path, savepath)
+        ans = input("Move wavs? (y/n)")
+        if ans.lower() == "y":
+            savepath = join(
+                expanduser("~"), "SpeechCorpus/Robot/data/training_set/audio"
+            )
+            move_wavs(path, savepath)
 
     # saves vad
-    print("Processing user_evaluation_set")
-    path = join(expanduser("~"), "SpeechCorpus/Robot/data/user_evaluation_set")
-    savepath = join(expanduser("~"), "SpeechCorpus/Robot/data/user_evaluation_set/vad")
-    save_all_vads(path, savepath)
+    ans = input("Process eval? (y/n)")
+    if ans.lower() == "y":
+        print("Processing user_evaluation_set")
+        path = join(expanduser("~"), "SpeechCorpus/Robot/data/user_evaluation_set")
+        savepath = join(
+            expanduser("~"), "SpeechCorpus/Robot/data/user_evaluation_set/vad"
+        )
+        save_all_vads(path, savepath)
 
-    # moves wavs (not
-    savepath = join(
-        expanduser("~"), "SpeechCorpus/Robot/data/user_evaluation_set/audio"
-    )
-    move_wavs(path, savepath)
+        # moves wavs (not
+        savepath = join(
+            expanduser("~"), "SpeechCorpus/Robot/data/user_evaluation_set/audio"
+        )
+        move_wavs(path, savepath)
