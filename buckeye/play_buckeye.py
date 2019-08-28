@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io.wavfile import read, write
 
-from turntaking.utils import read_wav
+from speechcorpus.utils import read_wav
 import sounddevice as sd
 
 sd.default.samplerate = 16000

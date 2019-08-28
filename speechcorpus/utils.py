@@ -1,5 +1,6 @@
 from subprocess import check_output
 from scipy.io.wavfile import read
+import json
 import numpy as np
 
 
@@ -11,6 +12,24 @@ def read_wav(path, norm=False):
     if norm:
         y /= np.abs(y).max()
     return y, sr
+
+
+def read_json(path):
+    with open(path, "r", encoding="utf8") as f:
+        data = json.loads(f.read())
+    return data
+
+
+def print_dict(d, indent=2):
+    if not isinstance(d, dict):
+        print(f"Can't print {type(d)}. Requires dict")
+        return None
+    print(json.dumps(d, indent=indent))
+
+
+def write_json(data, filename):
+    with open(filename, "w", encoding="utf-8") as jsonfile:
+        json.dump(data, jsonfile, ensure_ascii=False)
 
 
 def read_txt(filename):

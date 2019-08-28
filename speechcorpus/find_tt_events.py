@@ -2,12 +2,67 @@ from os.path import join, expanduser
 from os import listdir, makedirs
 from tqdm import tqdm
 import numpy as np
-from turntaking.utils import (
-    read_json,
-    find_nonzero_start_ends,
-    time_to_frames,
-    frames_to_time,
-)
+from speechcorpus.utils import read_json
+
+
+def find_island_idx_len(x):
+    """
+    finds "islands" with same values.
+
+    returns:
+        idx:        start indices of islands
+        dur:        lenght/size/duration of islands
+        val:        the values of the islands
+    """
+    assert x.ndim == 1
+    n = len(x)
+    y = x[1:] != x[:-1]  # pairwise unequal (string safe)
+    i = np.append(np.where(y), n - 1)  # must include last element posi
+    dur = np.diff(np.append(-1, i))  # run lengths
+    idx = np.cumsum(np.append(0, dur))[:-1]  # positions
+    return idx, dur, x[i]
+
+
+def get_silence_vad_idx_duration(x):
+    """
+    Returns the starting indices and duration for silence and vad
+    (assuming the input vector x is binary of ones and zeros).
+
+    Arguments:
+        x:          np.ndarray (ndim == 1) e.g (500,)
+
+    Returns:
+        sil_idx:    np.ndarray (ndim == 1) e.g (32,)
+        sil_dur:    np.ndarray (ndim == 1) e.g (32,)
+        vad_idx:    np.ndarray (ndim == 1) e.g (32,)
+        vad_dur:    np.ndarray (ndim == 1) e.g (32,)
+    """
+    idx, dur, _ = find_island_idx_len(x)
+    s = 0 if x[0] == 0 else 1
+    v = 1 if s == 0 else 0
+    sil_idx = idx[s::2]
+    sil_dur = dur[s::2]
+    vad_idx = idx[v::2]
+    vad_dur = dur[v::2]
+    return sil_idx, sil_dur, vad_idx, vad_dur
+
+
+def find_nonzero_start_ends(x):
+    """
+    Returns the starting indices and duration for silence and vad
+    (assuming the input vector x is binary of ones and zeros).
+    """
+    sil_idx, sil_dur, starts, vad_dur = get_silence_vad_idx_duration(x)
+    ends = starts + vad_dur
+    return starts, ends
+
+
+def time_to_frames(t, frame_length=50e-3):
+    return int(t / frame_length)
+
+
+def frames_to_time(t, frame_length=50e-3):
+    return t * frame_length
 
 
 def feats_append_event(
@@ -227,7 +282,6 @@ def test_events(anno_events=None, custom_events=None):
 
 
 if __name__ == "__main__":
-    from turntaking.utils import read_json
     import argparse
 
     datapath = join(expanduser("~"), "TurnTaking/data/features")
