@@ -80,8 +80,10 @@ if __name__ == "__main__":
     if ans.lower() == "y":
         print("Processing training_set")
         path = join(expanduser("~"), "SpeechCorpus/Robot/data/training_set")
-        savepath = join(expanduser("~"), "SpeechCorpus/Robot/data/training_set/vad")
-        save_all_vads(path, savepath)
+        ans = input("Extract vad? (y/n)")
+        if ans.lower() == "y":
+            savepath = join(expanduser("~"), "SpeechCorpus/Robot/data/training_set/vad")
+            save_all_vads(path, savepath)
 
         ans = input("Move wavs? (y/n)")
         if ans.lower() == "y":
