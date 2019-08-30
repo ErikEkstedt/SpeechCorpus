@@ -160,9 +160,11 @@ def get_vads_holds_shifts(xml_path, wav_path):
 
     events = np.array(events, dtype=np.float32)
     events[:, 0] /= total_duration
+    shifts = np.array(shifts, dtype=np.float32) / total_duration
+    holds = np.array(holds, dtype=np.float32) / total_duration
     vad0 = np.array(ch0, dtype=np.float32) / total_duration
     vad1 = np.array(ch1, dtype=np.float32) / total_duration
-    return (vad0, vad1), events
+    return (vad0, vad1), events, {"shifts": shifts, "holds": holds}
 
 
 def save_all_vads_holds_shifts(datapath, savepath):
@@ -180,6 +182,7 @@ def save_all_vads_holds_shifts(datapath, savepath):
                 makedirs(fpath, exist_ok=True)
                 vad_path = join(fpath, "vad.npy")
                 hold_shift_path = join(fpath, "events.npy")
+                hold_shift_named_path = join(fpath, "events_named.npy")
                 wav_path = [
                     f
                     for f in files
@@ -188,9 +191,10 @@ def save_all_vads_holds_shifts(datapath, savepath):
                 wav_path = join(dirpath, wav_path)
                 xml_path = [f for f in files if f.endswith(".xml")][0]
                 xml_path = join(dirpath, xml_path)
-                vad, events = get_vads_holds_shifts(xml_path, wav_path)
+                vad, events, events_named = get_vads_holds_shifts(xml_path, wav_path)
                 np.save(vad_path, vad, allow_pickle=True)
                 np.save(hold_shift_path, events, allow_pickle=True)
+                np.save(hold_shift_named_path, events_named, allow_pickle=True)
 
 
 if __name__ == "__main__":
