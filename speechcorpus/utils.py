@@ -14,6 +14,17 @@ def read_wav(path, norm=False):
     return y, sr
 
 
+def list_starts_ends_percentage_to_onehot(x, frames):
+    """ converts a list of length Channels to a onehot array of shape (Channels, frames)"""
+    assert isinstance(x, list)
+    onehot = np.zeros((len(x), frames))
+    for i, ch in enumerate(x):
+        ch = (ch * frames).round().astype(np.int)
+        for s, e in ch:
+            onehot[i, s:e] = 1
+    return onehot
+
+
 def read_json(path):
     with open(path, "r", encoding="utf8") as f:
         data = json.loads(f.read())
