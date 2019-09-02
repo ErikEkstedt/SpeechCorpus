@@ -52,7 +52,7 @@ def save_all_vads(datapath, savepath):
                 np.save(filename, vad, allow_pickle=True)
 
 
-def move_wavs(datapath, savepath):
+def copy_wavs(datapath, savepath):
     makedirs(savepath, exist_ok=True)
     for dirpath, dirnames, files in walk(datapath):
         if len(files) > 0:
@@ -71,8 +71,7 @@ def move_wavs(datapath, savepath):
                     if f.endswith(".wav") and not f.endswith("user.wav")
                 ][0]
                 from_path = join(dirpath, wav_path)
-
-                shutil.move(from_path, to_path)
+                shutil.copy(from_path, to_path)
 
 
 def process_train():
@@ -202,8 +201,11 @@ if __name__ == "__main__":
     print("Processing training_set")
     path = join(expanduser("~"), "SpeechCorpus/Robot/data/training_set")
     ans = input("Extract vad? (y/n)")
+
     if ans.lower() == "y":
         savepath = join(
             expanduser("~"), "SpeechCorpus/Robot/data/training_set/vad_shift_holds"
         )
         save_all_vads_holds_shifts(path, savepath)
+
+    # copy_wavs(path, 'data/training_set/audio')
