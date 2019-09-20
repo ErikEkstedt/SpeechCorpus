@@ -1,6 +1,7 @@
 from subprocess import check_output
 from scipy.io.wavfile import read
 import json
+import csv
 import numpy as np
 
 
@@ -14,11 +15,31 @@ def read_wav(path, norm=False):
     return y, sr
 
 
-def list_starts_ends_percentage_to_onehot(x, frames):
+def read_csv(path, delimiter=","):
+    data = []
+    with open(path, "r", encoding="utf-8") as f:
+        csv_reader = csv.reader(f, delimiter=delimiter)
+        for row in csv_reader:
+            data.append(row)
+    return data
+
+
+# def list_starts_ends_percentage_to_onehot(x, frames):
+#     """ converts a list of length Channels to a onehot array of shape (Channels, frames)"""
+#     assert isinstance(x, list)
+#     onehot = np.zeros((len(x), frames))
+#     for i, ch in enumerate(x):
+#         ch = (ch * frames).round().astype(np.int)
+#         for s, e in ch:
+#             onehot[i, s:e] = 1
+#     return onehot
+
+
+def list_percentage_to_onehot(vad, frames):
     """ converts a list of length Channels to a onehot array of shape (Channels, frames)"""
-    assert isinstance(x, list)
-    onehot = np.zeros((len(x), frames))
-    for i, ch in enumerate(x):
+    assert isinstance(vad, list)
+    onehot = np.zeros((len(vad), frames))
+    for i, ch in enumerate(vad):
         ch = (ch * frames).round().astype(np.int)
         for s, e in ch:
             onehot[i, s:e] = 1
