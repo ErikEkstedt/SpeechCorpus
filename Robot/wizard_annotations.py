@@ -4,9 +4,9 @@ import xml.etree.ElementTree as ET
 import numpy as np
 from os import makedirs, listdir, system
 from os.path import join, expanduser, isfile
-from speechcorpus.utils import read_wav, get_duration_sox
 import shutil
 from tqdm import tqdm
+from speechcorpus.utils import read_wav, get_duration_sox, list_percentage_to_onehot
 
 
 def get_vad(xml_path, wav_path, duration=None):
@@ -80,7 +80,6 @@ def get_all_vads_wavs(root_path, vad_path, audio_path, save=False):
 
 
 if __name__ == "__main__":
-    from speechcorpus.utils import list_percentage_to_onehot
     from turntaking.plot_utils import visualize_vad
     import matplotlib.pyplot as plt
     import sounddevice as sd
@@ -89,26 +88,3 @@ if __name__ == "__main__":
     vad_path = join(root_path, "vad")
     audio_path = join(root_path, "audio")
     get_all_vads_wavs(root_path, vad_path, audio_path, save=True)
-
-    # user_xml = join(root_path, "001_1_user.xml")
-    # user_wav = join(root_path,"001_1_user.wav")
-    # system_xml = join(root_path,"001_1_system.xml")
-    # system_wav = join(root_path,"001_1_system.wav")
-
-    # test
-    # vad_path = join(vad_path, '001_1', 'vad.npy')
-    # wav_path = join(audio_path, '001_1.wav')
-
-    # y, sr = read_wav(wav_path)
-
-    # vad = list(np.load(vad_path))
-
-    # dur = get_duration_sox(wav_path)
-    # n_frames = round(dur / 0.05)
-    # vad_oh = list_percentage_to_onehot(vad, n_frames)
-    # plt.close()
-    # visualize_vad(vad_oh)
-    # plt.xlim([0, vad_oh.shape[1]])
-    # plt.tight_layout()
-    # plt.pause(0.01)
-    # sd.play(y, samplerate=sr)
