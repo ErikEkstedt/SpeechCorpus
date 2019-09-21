@@ -80,7 +80,7 @@ def get_holds_shifts_train(xml_path, wav_path):
 
     tracks = data.getElementsByTagName("track")
     tracks = [t.attributes["id"].value for t in tracks]
-    holds, shifts = [], []
+    holds, shifts, optional = [], [], []
     events = []
     prev_speaker = False
     for seg in data.getElementsByTagName("segment"):
@@ -103,14 +103,16 @@ def get_holds_shifts_train(xml_path, wav_path):
                     shifts.append(end)
                     next_speaker = not prev_speaker
                 elif feedback == "optional":
+                    optional.append(end)
                     next_speaker = 2.0
                 events.append((end, float(next_speaker), float(prev_speaker)))
 
     events = np.array(events, dtype=np.float32)
     events[:, 0] /= total_duration
+    optional = np.array(optional, dtype=np.float32) / total_duration
     shifts = np.array(shifts, dtype=np.float32) / total_duration
     holds = np.array(holds, dtype=np.float32) / total_duration
-    return events, {"shifts": shifts, "holds": holds}
+    return events, {"shifts": shifts, "holds": holds, "optional": optional}
 
 
 def save_all_holds_shifts_train(datapath, savepath):
@@ -278,7 +280,7 @@ if __name__ == "__main__":
 
     if ans.lower() == "y":
 
-        savepath = join(expanduser("~"), "SpeechCorpus/Robot/data/training_set/vad2")
+        savepath = join(expanduser("~"), "SpeechCorpus/Robot/data/training_set/vad")
         save_all_vads(path, savepath)
         save_all_holds_shifts_train(path, savepath)
 
