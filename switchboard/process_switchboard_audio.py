@@ -5,6 +5,49 @@ from tqdm import tqdm
 import shutil
 import random
 
+"""
+Switchboard data is .sph files
+Channels       : 2
+Sample Rate    : 8000
+Precision      : 14-bit
+Bit Rate       : 128k
+Sample Encoding: 8-bit u-law
+
+For both librosa (using soundfile by default falls back on audioread) and 
+scipy to read the audio we want to convert it to .wav
+
+
+
+Soundfile support: http://www.mega-nerd.com/libsndfile/#Features
+
+---------------------
+Works on librosa: sox sw0234.sph  sw0234.wav
+
+Channels       : 2
+Sample Rate    : 8000
+Precision      : 14-bit
+Bit Rate       : 128k
+Sample Encoding: 8-bit u-law
+
+BREAKS on scipy!
+----------------------
+
+Works on librosa and scipy : sox sw0234.sph -b 16 sw0234.wav
+
+Channels       : 2
+Sample Rate    : 8000
+Precision      : 16-bit
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+
+BREAKS on scipy!
+
+----------------------
+
+
+
+"""
+
 
 def resample_audio(audio_path, savepath=None, sr=16000, bitrate=16):
     files = glob(join(abspath(audio_path), "**/*.sph"), recursive=True)
@@ -63,3 +106,17 @@ if __name__ == "__main__":
     ans = input("Split audio data into audio/audio_test? (y/n)")
     if ans.lower() == "y":
         split_data("data/audio", "data/audio_test")
+
+    import librosa
+    from turntaking.utils import read_wav
+    import numpy as np
+
+    y_lib, sr = librosa.load("test.wav", sr=None, mono=False)
+
+    y_lib, sr = librosa.load("test2.wav", sr=None, mono=False)
+
+    y, sr = read_wav("test2.wav")
+    y = y.T
+
+    print("Difference ch0: ", (y_lib[0] != y[0]).sum())  # 0
+    print("Difference ch1: ", (y_lib[1] != y[1]).sum())  # 0
