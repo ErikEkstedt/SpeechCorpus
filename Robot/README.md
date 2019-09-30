@@ -19,3 +19,25 @@ Extract Vads
     - some wavs have something wrong with header or the like
     - This script only runs soz and resamples the audio to the same samplerate -> fixes
       files
+
+
+## CityCS
+
+* system + user
+* city questions from images, standing in a crossing etc
+* City crowdsourcing
+
+## CmpDSYSEval
+
+* 
+
+## Maptask + MatpaskUES 
+
+maptask with a system + user evaluation study with model
+
+
+## Tatsuro
+
+Describe a trip you have made etc, toyota.
+
+
