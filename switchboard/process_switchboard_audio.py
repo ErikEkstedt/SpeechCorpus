@@ -93,15 +93,34 @@ def split_data(audio_path, out_path, n_test_files=438):
         shutil.move(src, dst)
 
 
+def move_audio(extracted_path="data/raw_audio", audio_path="data/audio"):
+    try:
+        makedirs(audio_path)
+    except:
+        print(audio_path, " already exists")
+        ans = input("\nRemove folder and continue? (y/n)\n> ")
+        if ans.lower() == "y":
+            shutil.rmtree(audio_path)
+            makedirs(audio_path)
+        else:
+            return None
+    for sph_file in glob(join(extracted_path, "**/**/*.sph")):
+        name = basename(sph_file).replace("sw0", "sw")
+        to_path = join(audio_path, name)
+        shutil.move(sph_file, to_path)
+
+
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Process Switchboard Audio")
-    parser.add_argument("--audio_path", default="data")
-    parser.add_argument("--out_path", default="data/audio")
+    parser.add_argument("--extracted_path", default="data/raw_audio")
+    parser.add_argument("--audio_path", default="data/audio")
     args = parser.parse_args()
 
-    resample_audio(args.audio_path, args.out_path)
+    move_audio(args.extracted_path, args.audio_path)
+
+    # resample_audio(args.audio_path, args.out_path)
 
     ans = input("Split audio data into audio/audio_test? (y/n)")
     if ans.lower() == "y":
