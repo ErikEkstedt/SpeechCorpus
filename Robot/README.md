@@ -9,6 +9,18 @@ Dataset containing dialogues between a human and a robot.
   - [Download](http://www.speech.kth.se/maptask/user_evaluation_set_11Nov2014.zip)
 
 
+## Unzip and Organize
+
+* Run `unzip_and_organize.py`
+  - Extracts zip files and organize them into appropriate folder structure
+* Run `resample_switchboard_format.py`
+  - Creates audio_resample folder with 8k mulaw encoded .sph files (like switchboard)
+  - There is one difference in bitrate (swb: 128k vs resampled 64.1k) which I don't know
+    how to fix. It should not disrupt the feature extraction and listening is fine.
+
+
+
+
 ## Vad
 
 Extract Vads

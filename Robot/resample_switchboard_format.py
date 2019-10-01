@@ -1,5 +1,7 @@
 from os.path import join, expanduser, basename
+from os import makedirs, listdir
 from subprocess import call, DEVNULL
+from speechcorpus.utils import resample_wav2sph
 
 
 """
@@ -45,22 +47,39 @@ But downsampling to the same levels and using mu-law encoding should be good eno
 """
 
 
-def resample_wav2sph(audiopath, to_path):
-    """ Resample from .wav ->  .sph and mu-law encoding using sox """
-    # ffmpeg_cmd = ["ffmpeg", "-i", audiopath, "-acodec", "pcm_mulaw", "-ar", str(8000), to_path]
-    cmd = ["sox", audiopath, "-e", "mu-law", "-r", str(8000), "-c", str(1), to_path]
-    call(cmd, stdout=DEVNULL)
+def resample_audio_folder(audiofolder, to_dir):
+    makedirs(to_dir)
+    for wav in listdir(audiofolder):
+        from_path = join(audiofolder, wav)
+        to_path = join(to_dir, wav.replace(".wav", ".sph"))
+        resample_wav2sph(from_path, to_path)
 
 
 if __name__ == "__main__":
-    import argparse
 
-    parser = argparse.ArgumentParser(description="Resample audio")
-    parser.add_argument("--audio_folder", default="")
-    parser.add_argument("--to_folder", default="")
-    args = parser.parse_args()
+    root = "data/robot_labeled"
 
-    audiopath = "session_001.user.wav"
-    to_path = "session_001.user.sph"
+    # training
+    audiopath = join(root, "training_set/audio")
+    to_path = join(root, "training_set/audio_resampled")
+    resample_audio_folder(audiopath, to_path)
 
-    resample_wav2sph(audiopath, to_path)
+    # eval
+    audiopath = join(root, "user_evaluation_set/audio")
+    to_path = join(root, "user_evaluation_set/audio_resampled")
+    resample_audio_folder(audiopath, to_path)
+
+    # wizard
+    audiopath = join(root, "wizard/audio")
+    to_path = join(root, "wizard/audio_resampled")
+    resample_audio_folder(audiopath, to_path)
+
+    # wizard eval random
+    audiopath = join(root, "wizard_eval_random/audio")
+    to_path = join(root, "wizard_eval_random/audio_resampled")
+    resample_audio_folder(audiopath, to_path)
+
+    # wizard eval model
+    audiopath = join(root, "wizard_eval_model/audio")
+    to_path = join(root, "wizard_eval_model/audio_resampled")
+    resample_audio_folder(audiopath, to_path)

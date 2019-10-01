@@ -1,4 +1,4 @@
-from subprocess import check_output
+from subprocess import check_output, call, DEVNULL
 from scipy.io.wavfile import read
 import json
 import csv
@@ -22,17 +22,6 @@ def read_csv(path, delimiter=","):
         for row in csv_reader:
             data.append(row)
     return data
-
-
-# def list_starts_ends_percentage_to_onehot(x, frames):
-#     """ converts a list of length Channels to a onehot array of shape (Channels, frames)"""
-#     assert isinstance(x, list)
-#     onehot = np.zeros((len(x), frames))
-#     for i, ch in enumerate(x):
-#         ch = (ch * frames).round().astype(np.int)
-#         for s, e in ch:
-#             onehot[i, s:e] = 1
-#     return onehot
 
 
 def list_percentage_to_onehot(vad, frames):
@@ -80,6 +69,26 @@ def write_txt(filename, data):
     """
     with open(filename, "w") as f:
         f.write("\n".join(data))
+
+
+# Audio
+
+
+def resample_wav2sph(audiopath, to_path, channels=2):
+    """ Resample from .wav ->  .sph and mu-law encoding using sox """
+    # ffmpeg_cmd = ["ffmpeg", "-i", audiopath, "-acodec", "pcm_mulaw", "-ar", str(8000), to_path]
+    cmd = [
+        "sox",
+        audiopath,
+        "-e",
+        "mu-law",
+        "-r",
+        str(8000),
+        "-c",
+        str(channels),
+        to_path,
+    ]
+    call(cmd, stdout=DEVNULL)
 
 
 def get_duration_sox(fpath):
