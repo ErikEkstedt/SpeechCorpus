@@ -1,5 +1,5 @@
 from os import system, makedirs, listdir, walk
-from os.path import join, expanduser, basename, isdir
+from os.path import join, expanduser, basename, isdir, split
 from subprocess import call, DEVNULL
 from glob import glob
 import shutil
@@ -26,7 +26,9 @@ def move_audio_annotations_training_eval_set(root="data/robot_labeled/training_s
 
     for fpath in wav_files:
         wav_name = basename(fpath)
-        to_path = join(to_dir, wav_name)
+        w = fpath.split("/")[-3]
+        new_name = w + "_" + wav_name
+        to_path = join(to_dir, new_name)
         shutil.move(fpath, to_path)
 
     anno_files = glob(join(root, "**/**/*.xml"))
@@ -35,7 +37,9 @@ def move_audio_annotations_training_eval_set(root="data/robot_labeled/training_s
 
     for fpath in anno_files:
         wav_name = basename(fpath)
-        to_path = join(to_dir, wav_name)
+        w = fpath.split("/")[-3]
+        new_name = w + "_" + wav_name
+        to_path = join(to_dir, w + "_" + wav_name)
         shutil.move(fpath, to_path)
 
     # remove empty folders
@@ -74,11 +78,16 @@ def move_audio_annotations_wizard(root="data/robot_labeled/wizard"):
 def move_audio_annotations_wizard_eval(root="data/robot_labeled/wizard_eval"):
     """ move audio robot and random """
 
+    root_rand = join(split(root)[0], "wizard_eval_random")
+    root_model = join(split(root)[0], "wizard_eval_model")
+    makedirs(root_rand)
+    makedirs(root_model)
+
     # rename xml files as audio
-    random_audio = join(root, "audio_random")
-    random_anno = join(root, "annotations_random")
-    model_audio = join(root, "audio_model")
-    model_anno = join(root, "annotations_model")
+    random_audio = join(root_rand, "audio")
+    random_anno = join(root_rand, "annotations")
+    model_audio = join(root_model, "audio")
+    model_anno = join(root_model, "annotations")
     makedirs(random_audio)
     makedirs(random_anno)
     makedirs(model_audio)
