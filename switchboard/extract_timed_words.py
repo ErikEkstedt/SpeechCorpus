@@ -3,7 +3,7 @@ from os.path import join, basename
 from glob import glob
 from tqdm import tqdm
 import numpy as np
-from speechcorpus.utils import read_txt, get_duration_sox
+from speechcorpus.utils import read_txt, get_duration_sox, write_txt
 
 
 class WordExtractor(object):
@@ -41,6 +41,7 @@ class WordExtractor(object):
 
         self.save_lists(
             name,
+            duration,
             [vad, vad1],
             [words, words1],
             [timed_words, timed_words1],
@@ -48,15 +49,17 @@ class WordExtractor(object):
             [noise, noise1],
         )
 
-    def save_lists(self, name, vad, words, timed_words, silence, noise):
+    def save_lists(self, name, duration, vad, words, timed_words, silence, noise):
         # Paths
         session_path = join(self.save_path, name)
         makedirs(session_path, exist_ok=True)
+        dur_path = join(session_path, "duration.npy")
         word_path = join(session_path, "words.npy")
         tw_path = join(session_path, "timed_words.npy")
         vad_path = join(session_path, "vad.npy")
         noise_path = join(session_path, "noise.npy")
         silence_path = join(session_path, "silence.npy")
+        np.save(dur_path, duration, allow_pickle=True)
         np.save(word_path, words, allow_pickle=True)
         np.save(tw_path, timed_words, allow_pickle=True)
         np.save(vad_path, vad, allow_pickle=True)
