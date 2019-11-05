@@ -77,7 +77,7 @@ def create_formatted_movie_lines(path=None, datafile=None, verbose=False):
 
     if datafile is None:
         # Define path to new file
-        datafile = os.path.join(corpus, "formatted_movie_lines.txt")
+        datafile = os.path.join("data", "formatted_movie_lines.txt")
 
     delimiter = "\t"
     delimiter = str(
