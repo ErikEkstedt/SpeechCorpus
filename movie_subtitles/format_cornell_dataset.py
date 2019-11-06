@@ -60,8 +60,8 @@ def extractSentencePairs(conversations):
         for i in range(
             len(conversation["lines"]) - 1
         ):  # We ignore the last line (no answer for it)
-            inputLine = conversation["lines"][i]["text"].strip()
-            targetLine = conversation["lines"][i + 1]["text"].strip()
+            inputLine = conversation["lines"][i]["text"].strip().replace("|", "")
+            targetLine = conversation["lines"][i + 1]["text"].strip().replace("|", "")
             # Filter wrong samples (if one of the lists is empty)
             if inputLine and targetLine:
                 qa_pairs.append([inputLine, targetLine])
@@ -79,7 +79,7 @@ def create_formatted_movie_lines(path=None, datafile=None, verbose=False):
         # Define path to new file
         datafile = os.path.join("data", "formatted_movie_lines.txt")
 
-    delimiter = "\t"
+    delimiter = "|"
     delimiter = str(
         codecs.decode(delimiter, "unicode_escape")
     )  # Unescape the delimiter
