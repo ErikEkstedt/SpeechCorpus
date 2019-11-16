@@ -16,6 +16,7 @@ Extracts:
     - POS
     - Silence
     - Noise
+    - Duration
 
 * Save vad as arrays with percentages based on time
     - (vad_start, vad_end) / total_duration
@@ -187,6 +188,7 @@ def get_annotation(fname, anno_path, audio_path):
         "pos": pos,
         "silence": silence,
         "noise": noise,
+        "duration": duration,
     }
 
 
@@ -204,6 +206,7 @@ def save_maptask_anno(audio_path, anno_path, save_path):
         vad_path = join(session_path, "vad.npy")
         noise_path = join(session_path, "noise.npy")
         silence_path = join(session_path, "silence.npy")
+        duration_path = join(session_path, "duration.npy")
         pos_path = join(session_path, "pos.npy")
 
         if (
@@ -223,13 +226,14 @@ def save_maptask_anno(audio_path, anno_path, save_path):
         np.save(pos_path, anno["pos"], allow_pickle=True)
         np.save(noise_path, anno["noise"], allow_pickle=True)
         np.save(silence_path, anno["silence"], allow_pickle=True)
+        np.save(duration_path, anno["duration"], allow_pickle=True)
 
 
 if __name__ == "__main__":
 
     audio_path = "data/audio"
     anno_path = "data/annotations"
-    save_path = "data/nlp2"
+    save_path = "data/nlp"
 
     save_maptask_anno(audio_path, anno_path, save_path)
     # save_maptask_vad(audio_path, anno_path, save_path)
