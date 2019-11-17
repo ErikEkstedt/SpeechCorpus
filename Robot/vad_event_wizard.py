@@ -80,11 +80,10 @@ def get_all_vads_wavs(root_path, vad_path, audio_path, save=False):
 
 
 if __name__ == "__main__":
-    from turntaking.plot_utils import visualize_vad
     import matplotlib.pyplot as plt
     import sounddevice as sd
 
-    root_path = "data/wizard"
+    root_path = "data/robot_labeled/wizard"
     vad_path = join(root_path, "vad")
     audio_path = join(root_path, "audio")
     get_all_vads_wavs(root_path, vad_path, audio_path, save=True)

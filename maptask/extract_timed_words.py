@@ -205,6 +205,7 @@ def save_maptask_anno(audio_path, anno_path, save_path):
         noise_path = join(session_path, "noise.npy")
         silence_path = join(session_path, "silence.npy")
         pos_path = join(session_path, "pos.npy")
+        dur_path = join(session_path, "duration.npy")
 
         if (
             exists(word_path)
@@ -223,6 +224,7 @@ def save_maptask_anno(audio_path, anno_path, save_path):
         np.save(pos_path, anno["pos"], allow_pickle=True)
         np.save(noise_path, anno["noise"], allow_pickle=True)
         np.save(silence_path, anno["silence"], allow_pickle=True)
+        np.save(dur_path, anno["duration"], allow_pickle=True)
 
 
 if __name__ == "__main__":

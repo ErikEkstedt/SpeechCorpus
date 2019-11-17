@@ -23,7 +23,7 @@ def get_words(path):
     ch_words = list(np.load(path, allow_pickle=True))
     for ch in ch_words:
         for word in ch:
-            counter.update([clean(word["word"])])
+            counter.update([word["word"]])
     return counter
 
 
