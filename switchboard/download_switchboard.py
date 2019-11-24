@@ -3,8 +3,11 @@ from os.path import join, expanduser, exists, abspath, basename
 from glob import glob
 
 """
-REQUIRES LICENCE and ACCESS. 
+REQUIRES LICENCE and ACCESS for the audio
 Go to https://catalog.ldc.upenn.edu/LDC97S62 for further information.
+
+
+Annotations are freely avaliable.
 """
 
 
@@ -30,7 +33,7 @@ def download(datapath, anno_type):
     print("Extracting")
     system(f"tar xzf {tar_path} -C {datapath}")
 
-    print("Remove {tar_path}? (y/n)")
+    print(f"Remove {tar_path}? (y/n)")
     ans = input()
     if ans.lower() == "y":
         system(f"rm {tar_path}")

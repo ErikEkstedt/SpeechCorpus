@@ -16,6 +16,7 @@ Extracts:
     - POS
     - Silence
     - Noise
+    - Duration
 
 * Save vad as arrays with percentages based on time
     - (vad_start, vad_end) / total_duration
@@ -187,6 +188,7 @@ def get_annotation(fname, anno_path, audio_path):
         "pos": pos,
         "silence": silence,
         "noise": noise,
+        "duration": duration,
     }
 
 
@@ -204,8 +206,8 @@ def save_maptask_anno(audio_path, anno_path, save_path):
         vad_path = join(session_path, "vad.npy")
         noise_path = join(session_path, "noise.npy")
         silence_path = join(session_path, "silence.npy")
+        duration_path = join(session_path, "duration.npy")
         pos_path = join(session_path, "pos.npy")
-        dur_path = join(session_path, "duration.npy")
 
         if (
             exists(word_path)
@@ -224,26 +226,26 @@ def save_maptask_anno(audio_path, anno_path, save_path):
         np.save(pos_path, anno["pos"], allow_pickle=True)
         np.save(noise_path, anno["noise"], allow_pickle=True)
         np.save(silence_path, anno["silence"], allow_pickle=True)
-        np.save(dur_path, anno["duration"], allow_pickle=True)
+        np.save(duration_path, anno["duration"], allow_pickle=True)
 
 
 if __name__ == "__main__":
 
     audio_path = "data/audio"
     anno_path = "data/annotations"
-    save_path = "data/nlp2"
+    save_path = "data/nlp3"
 
     save_maptask_anno(audio_path, anno_path, save_path)
     # save_maptask_vad(audio_path, anno_path, save_path)
 
-    # # Test
+    # Test
     if False:
-        ppath = "/Users/erik/SpeechCorpus/maptask/data/nlp2/q1ec1/pos.npy"
-        wpath = "/Users/erik/SpeechCorpus/maptask/data/nlp2/q1ec1/words.npy"
-        twpath = "/Users/erik/SpeechCorpus/maptask/data/nlp2/q1ec1/timed_words.npy"
-        vpath = "/Users/erik/SpeechCorpus/maptask/data/nlp2/q1ec1/vad.npy"
-        npath = "/Users/erik/SpeechCorpus/maptask/data/nlp2/q1ec1/noise.npy"
-        spath = "/Users/erik/SpeechCorpus/maptask/data/nlp2/q1ec1/silence.npy"
+        ppath = join(save_path, "q1ec1/pos.npy")
+        wpath = join(save_path, "q1ec1/words.npy")
+        twpath = join(save_path, "q1ec1/timed_words.npy")
+        vpath = join(save_path, "q1ec1/vad.npy")
+        npath = join(save_path, "q1ec1/noise.npy")
+        spath = join(save_path, "q1ec1/silence.npy")
 
         pos = list(np.load(ppath, allow_pickle=True))
         words = list(np.load(wpath, allow_pickle=True))

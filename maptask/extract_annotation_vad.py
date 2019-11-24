@@ -36,6 +36,12 @@ def get_timed_units(xml_path, duration):
             # elem.attrib: start, end, utt
             # tu.append({"time": tmp, "words": elem.text})
             id = elem.attrib["id"]
+            if len(elem.text.split()) > 1:
+                print(elem.text)
+                print(tmp)
+                input()
+            else:
+                print(elem.text)
             tu.append({"time": tmp, "words": elem.text, "id": id})
         elif elem.tag == "sil":
             # elem.attrib: start, end
@@ -189,14 +195,14 @@ def save_maptask_anno(audio_path, anno_path, save_path):
         silence_path = join(session_path, "silence.npy")
         pos_path = join(session_path, "pos.npy")
 
-        if (
-            exists(word_path)
-            and exists(vad_path)
-            and exists(silence_path)
-            and exists(noise_path)
-            and exists(pos_path)
-        ):
-            continue
+        # if (
+        #     exists(word_path)
+        #     and exists(vad_path)
+        #     and exists(silence_path)
+        #     and exists(noise_path)
+        #     and exists(pos_path)
+        # ):
+        #     continue
 
         anno = get_annotation(wav, anno_path, audio_path)
 
@@ -208,21 +214,24 @@ def save_maptask_anno(audio_path, anno_path, save_path):
 
 
 if __name__ == "__main__":
+    from os.path import join
+
+    from turntaking.dataprocessing.tokenizer import NewCustomTokenizer
 
     audio_path = "data/audio"
     anno_path = "data/annotations"
-    save_path = "data/nlp"
+    save_path = "data/nlp3"
 
     save_maptask_anno(audio_path, anno_path, save_path)
     # save_maptask_vad(audio_path, anno_path, save_path)
 
     # # Test
     if False:
-        ppath = "/Users/erik/SpeechCorpus/maptask/data/nlp/q1ec1/pos.npy"
-        wpath = "/Users/erik/SpeechCorpus/maptask/data/nlp/q1ec1/words.npy"
-        vpath = "/Users/erik/SpeechCorpus/maptask/data/nlp/q1ec1/vad.npy"
-        npath = "/Users/erik/SpeechCorpus/maptask/data/nlp/q1ec1/noise.npy"
-        spath = "/Users/erik/SpeechCorpus/maptask/data/nlp/q1ec1/silence.npy"
+        ppath = join(save_path, "q1ec1/pos.npy")
+        wpath = join(save_path, "q1ec1/words.npy")
+        vpath = join(save_path, "q1ec1/vad.npy")
+        npath = join(save_path, "q1ec1/noise.npy")
+        spath = join(save_path, "q1ec1/silence.npy")
 
         pos = list(np.load(ppath, allow_pickle=True))
         words = list(np.load(wpath, allow_pickle=True))
@@ -230,7 +239,17 @@ if __name__ == "__main__":
         noise = list(np.load(npath, allow_pickle=True))
         silence = list(np.load(spath, allow_pickle=True))
 
-        w = words[0][0]
+        tokenizer = NewCustomTokenizer()
+
+        for dialog in listdir(save_path):
+            wpath = join(save_path, dialog, "words.npy")
+            words = list(np.load(wpath, allow_pickle=True))
+            for ch in range(2):
+                for w in words[ch]:
+                    toks = tokenizer(w)
+                    if len(toks) > 2:
+                        print(dialog, ":", w, "->", toks)
+                        input()
 
         print("words: ", len(words[0]))
         print("vad: ", len(vad[0]))

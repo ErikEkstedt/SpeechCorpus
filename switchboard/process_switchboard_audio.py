@@ -49,6 +49,23 @@ BREAKS on scipy!
 """
 
 
+def move_audio(extracted_path="data/raw_audio", audio_path="data/audio"):
+    try:
+        makedirs(audio_path)
+    except:
+        print(audio_path, " already exists")
+        ans = input("\nRemove folder and continue? (y/n)\n> ")
+        if ans.lower() == "y":
+            shutil.rmtree(audio_path)
+            makedirs(audio_path)
+        else:
+            return None
+    for sph_file in glob(join(extracted_path, "**/**/*.sph")):
+        name = basename(sph_file).replace("sw0", "sw")
+        to_path = join(audio_path, name)
+        shutil.move(sph_file, to_path)
+
+
 def resample_audio(audio_path, savepath=None, sr=16000, bitrate=16):
     files = glob(join(abspath(audio_path), "**/*.sph"), recursive=True)
     if not len(files) > 0:
@@ -93,23 +110,6 @@ def split_data(audio_path, out_path, n_test_files=438):
         shutil.move(src, dst)
 
 
-def move_audio(extracted_path="data/raw_audio", audio_path="data/audio"):
-    try:
-        makedirs(audio_path)
-    except:
-        print(audio_path, " already exists")
-        ans = input("\nRemove folder and continue? (y/n)\n> ")
-        if ans.lower() == "y":
-            shutil.rmtree(audio_path)
-            makedirs(audio_path)
-        else:
-            return None
-    for sph_file in glob(join(extracted_path, "**/**/*.sph")):
-        name = basename(sph_file).replace("sw0", "sw")
-        to_path = join(audio_path, name)
-        shutil.move(sph_file, to_path)
-
-
 if __name__ == "__main__":
     import argparse
 
@@ -121,21 +121,6 @@ if __name__ == "__main__":
     move_audio(args.extracted_path, args.audio_path)
 
     # resample_audio(args.audio_path, args.out_path)
-
-    ans = input("Split audio data into audio/audio_test? (y/n)")
-    if ans.lower() == "y":
-        split_data("data/audio", "data/audio_test")
-
-    import librosa
-    from turntaking.utils import read_wav
-    import numpy as np
-
-    y_lib, sr = librosa.load("test.wav", sr=None, mono=False)
-
-    y_lib, sr = librosa.load("test2.wav", sr=None, mono=False)
-
-    y, sr = read_wav("test2.wav")
-    y = y.T
-
-    print("Difference ch0: ", (y_lib[0] != y[0]).sum())  # 0
-    print("Difference ch1: ", (y_lib[1] != y[1]).sum())  # 0
+    # ans = input("Split audio data into audio/audio_test? (y/n)")
+    # if ans.lower() == "y":
+    #     split_data("data/audio", "data/audio_test")
