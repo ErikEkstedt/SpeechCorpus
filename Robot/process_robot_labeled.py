@@ -45,14 +45,17 @@ def lab_to_timed_words(lab_path, duration):
     lab1 = read_txt(lab_path)
     lab2 = read_txt(lab_path.replace("track1", "track2"))
 
-    tw, words = [[], []], [[], []]
+    tw, words, vad = [[], []], [[], []], [[], []]
     for i, labels in enumerate([lab1, lab2]):
         for row in labels:
             s, e, w = row.split()
+            s = float(s) / duration
+            e = float(e) / duration
             if w != "_":
-                tw[i].append((float(s) / duration, float(e) / duration, w))
+                vad[i].append((s, e))
+                tw[i].append((s, e, w))
                 words[i].append(w)
-    return tw, words
+    return vad, tw, words
 
 
 def organize_audio_and_nlp_data_train_set():
@@ -63,8 +66,8 @@ def organize_audio_and_nlp_data_train_set():
     "SpeechCorpus/Robot/data/robot_labeled/training_set/nlp"
     """
 
-    audio_path = "data/robot_labeled/training_set/audio"
-    nlp_path = "data/robot_labeled/training_set/nlp"
+    audio_path = "data/training_set/audio"
+    nlp_path = "data/training_set/nlp"
     makedirs(audio_path, exist_ok=True)
     makedirs(nlp_path, exist_ok=True)
 
@@ -75,7 +78,7 @@ def organize_audio_and_nlp_data_train_set():
 
         # Extraction
         duration = get_duration_sox(wav_path)
-        timed_words, words = lab_to_timed_words(lab_path, duration)
+        vad, timed_words, words = lab_to_timed_words(lab_path, duration)
 
         # Save paths
         name = f"{split_name[1]}_{split_name[-2]}"
@@ -86,6 +89,7 @@ def organize_audio_and_nlp_data_train_set():
 
         # Copy audio and save nlp data
         shutil.copy(wav_path, tmp_audio_path)
+        np.save(join(tmp_nlp_path, "vad.npy"), vad, allow_pickle=True)
         np.save(join(tmp_nlp_path, "timed_words.npy"), timed_words, allow_pickle=True)
         np.save(join(tmp_nlp_path, "words.npy"), words, allow_pickle=True)
         np.save(join(tmp_nlp_path, "duration.npy"), duration, allow_pickle=True)
