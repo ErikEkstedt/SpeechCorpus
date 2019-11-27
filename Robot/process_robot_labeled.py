@@ -26,8 +26,12 @@ def unzip_files():
     data, labeled_data = "data/train_data", "data/train_labeled_words"
     if not (exists(data) and exists(labeled_data)):
         print("Unzipping files to data/{train_data, train_labeled_words}")
-        system(f"unzip -d {data} data/training_set_11Nov2014.zip")
-        system(f"unzip -d {labeled_data} data/setup.zip")
+        audio_extraction = f"unzip -d {data} data/training_set_11Nov2014.zip"
+        label_extraction = f"unzip -d {labeled_data} data/setup.zip"
+        print("AUDIO: ", audio_extraction)
+        print("LABEL: ", label_extraction)
+        system(audio_extraction)
+        system(label_extraction)
         print("Done!")
     else:
         print("Data paths already exists! Delete or use that data")
