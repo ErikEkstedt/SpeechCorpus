@@ -187,7 +187,14 @@ def get_vads_holds_shifts_events_train(xml_path, wav_path):
     events[:, 0] /= total_duration
     shifts = np.array(shifts, dtype=np.float32) / total_duration
     holds = np.array(holds, dtype=np.float32) / total_duration
-    return events, {"shifts": shifts, "holds": holds}
+    return (
+        events,
+        {
+            "shifts": shifts,
+            "holds": holds,
+            "vad": (ch0 / total_duration, ch1 / total_duration),
+        },
+    )
 
 
 def save_shift_holds_labels():
@@ -220,3 +227,14 @@ if __name__ == "__main__":
     if ans.lower() == "y":
         organize_audio_and_nlp_data_train_set()
         save_shift_holds_labels()
+
+    # # Test
+    # ev_path = "data/training_set/nlp/1_session_001/events_named.npy"
+    # event = np.load(ev_path, allow_pickle=True).item()
+    # print(event.keys())
+    # vad = event['vad']
+    # shifts = event['shifts']
+    # holds = event['holds']
+    # print(vad)
+    # print(shifts)
+    # print(holds)
