@@ -12,6 +12,7 @@ import sys
 import shutil
 import numpy as np
 from tqdm import tqdm
+from xml.dom import minidom
 
 from turntaking.utils import read_txt, read_wav, get_duration_sox
 
@@ -135,6 +136,80 @@ def organize_audio_and_nlp_data_eval():
         np.save(join(tmp_nlp_path, "duration.npy"), duration, allow_pickle=True)
 
 
+def get_vads_holds_shifts_events_train(xml_path, wav_path):
+    """
+    Gets VAD from annotation of starts and ends. The events are manually labeled as what should have happened.
+    The event times are at the end of the user utterances.
+
+    In turntaking repo events are automatically annotated from what actually happened in the audio.
+    events are stored as list of tuples and transformed to numpy with the following structure:
+
+        event = [(time, next_speaker, prev_speaker), ..., (time, next_speaker, prev_speaker)]
+
+    shifts and holds are then calculated from those values.
+    """
+    data = minidom.parse(xml_path)
+    total_duration = get_duration_sox(wav_path)
+
+    tracks = data.getElementsByTagName("track")
+    tracks = [t.attributes["id"].value for t in tracks]
+    ch0, ch1 = [], []
+    holds, shifts = [], []
+    events = []
+    prev_speaker = False
+    for seg in data.getElementsByTagName("segment"):
+        start = float(seg.attributes["start"].value)
+        end = float(seg.attributes["end"].value)
+        features = seg.getElementsByTagName("features")
+        act, feedback, misc = None, None, None
+        if len(features) == 1:
+            for f in features[0].getElementsByTagName("feature"):
+                name = f.getAttribute("name")
+                if "feedback" == name:
+                    feedback = f.firstChild.data
+
+        if seg.attributes["track"].value == tracks[0]:
+            ch0.append((start, end))
+            if feedback is not None:
+                if feedback == "hold":
+                    holds.append(end)
+                    next_speaker = prev_speaker
+                elif feedback == "respond":
+                    shifts.append(end)
+                    next_speaker = not prev_speaker
+                elif feedback == "optional":
+                    next_speaker = 2.0
+                events.append((end, float(next_speaker), float(prev_speaker)))
+        else:
+            ch1.append((start, end))
+
+    events = np.array(events, dtype=np.float32)
+    events[:, 0] /= total_duration
+    shifts = np.array(shifts, dtype=np.float32) / total_duration
+    holds = np.array(holds, dtype=np.float32) / total_duration
+    return events, {"shifts": shifts, "holds": holds}
+
+
+def save_shift_holds_labels():
+    audio_dir = "data/training_set/audio"
+    xml_root = "data/train_data/training_set"
+    nlp_path = "data/training_set/nlp"
+
+    for wav in listdir(audio_dir):
+        a = wav.split("_")
+        name = "_".join(a[1:])
+        n = name[-5]
+        dir, session = a[0], name.replace(".wav", "")
+
+        xml_path = glob(join(xml_root, dir, session, "*.xml"))[0]
+        wav_path = join(audio_dir, wav)
+        events, events_named = get_vads_holds_shifts_events_train(xml_path, wav_path)
+
+        nlp_session = join(nlp_path, wav.replace(".wav", ""))
+        np.save(join(nlp_session, "events.npy"), events, allow_pickle=True)
+        np.save(join(nlp_session, "events_named.npy"), events_named, allow_pickle=True)
+
+
 if __name__ == "__main__":
 
     ans = input("Unzip files? (y/n)")
@@ -144,3 +219,4 @@ if __name__ == "__main__":
     ans = input("Process? (y/n)")
     if ans.lower() == "y":
         organize_audio_and_nlp_data_train_set()
+        save_shift_holds_labels()
