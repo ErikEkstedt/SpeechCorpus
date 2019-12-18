@@ -63,16 +63,22 @@ def lab_to_timed_words(lab_path, duration):
     return vad, tw, words
 
 
-def organize_audio_and_nlp_data_train_set():
+def organize_audio_and_nlp_data_train_set(
+    audio_path="data/training_set/audio", nlp_path="data/training_set/nlp"
+):
     """
+    Uses the aligned words from data/train_labeled_words to get vad, timed_words and words. Also sox to get duration in
+    seconds.
+
     Audio:
     splits:  SpeechCorpus/Robot/data/robot_labeled/training_set/audio/10_session_001.wav
     NLP:
     "SpeechCorpus/Robot/data/robot_labeled/training_set/nlp"
+
+
+
     """
 
-    audio_path = "data/training_set/audio"
-    nlp_path = "data/training_set/nlp"
     makedirs(audio_path, exist_ok=True)
     makedirs(nlp_path, exist_ok=True)
 
@@ -187,34 +193,54 @@ def get_vads_holds_shifts_events_train(xml_path, wav_path):
     events[:, 0] /= total_duration
     shifts = np.array(shifts, dtype=np.float32) / total_duration
     holds = np.array(holds, dtype=np.float32) / total_duration
-    return (
-        events,
-        {
-            "shifts": shifts,
-            "holds": holds,
-            "vad": (ch0 / total_duration, ch1 / total_duration),
-        },
-    )
+    vad = [np.array(ch0) / total_duration, np.array(ch1) / total_duration]
+    return (events, {"shifts": shifts, "holds": holds, "vad": vad})
 
 
-def save_shift_holds_labels():
-    audio_dir = "data/training_set/audio"
+def save_shift_holds_labels(
+    audio_path="data/training_set/audio", nlp_path="data/training_set/nlp"
+):
     xml_root = "data/train_data/training_set"
-    nlp_path = "data/training_set/nlp"
 
-    for wav in listdir(audio_dir):
+    for wav in listdir(audio_path):
         a = wav.split("_")
         name = "_".join(a[1:])
         n = name[-5]
         dir, session = a[0], name.replace(".wav", "")
 
         xml_path = glob(join(xml_root, dir, session, "*.xml"))[0]
-        wav_path = join(audio_dir, wav)
+        wav_path = join(audio_path, wav)
         events, events_named = get_vads_holds_shifts_events_train(xml_path, wav_path)
 
         nlp_session = join(nlp_path, wav.replace(".wav", ""))
         np.save(join(nlp_session, "events.npy"), events, allow_pickle=True)
         np.save(join(nlp_session, "events_named.npy"), events_named, allow_pickle=True)
+
+
+def test():
+    import matplotlib.pyplot as plt
+    from turntaking.plot_utils import plot_vad
+
+    organize_audio_and_nlp_data_train_set(
+        audio_path="data/test/audio", nlp_path="data/test/nlp"
+    )
+
+    save_shift_holds_labels(audio_path="data/test/audio", nlp_path="data/test/nlp")
+
+    # # Test
+    # ev_path = "data/training_set/nlp/1_session_001/events_named.npy"
+    ev_path = "data/test/nlp/1_session_001/events_named.npy"
+    event = np.load(ev_path, allow_pickle=True).item()
+    # ev_path = "data/training_set/nlp/1_session_001/events.npy"
+    # event = np.load(ev_path, allow_pickle=True)
+    print(event.keys())
+    vad = event["vad"]
+    shifts = event["shifts"]
+    holds = event["holds"]
+    print(vad[0].shape)
+    print(vad[1].shape)
+    print(len(shifts))
+    print(len(holds))
 
 
 if __name__ == "__main__":
@@ -225,16 +251,17 @@ if __name__ == "__main__":
 
     ans = input("Process? (y/n)")
     if ans.lower() == "y":
-        organize_audio_and_nlp_data_train_set()
-        save_shift_holds_labels()
 
-    # # Test
-    # ev_path = "data/training_set/nlp/1_session_001/events_named.npy"
-    # event = np.load(ev_path, allow_pickle=True).item()
-    # print(event.keys())
-    # vad = event['vad']
-    # shifts = event['shifts']
-    # holds = event['holds']
-    # print(vad)
-    # print(shifts)
-    # print(holds)
+        # Uses the aligned words from data/train_labeled_words.
+        # Extracts vad, timed_words and words from these labels.
+        # Uses 'sox' to extract duration in seconds.
+        organize_audio_and_nlp_data_train_set()
+
+        # Looks in the original labels to find the labeled shift/hold events
+        # Extracts the labels and vad from the base annotations
+        # Saves
+        #   events.npy:     array of (end of utterance, next_speaker, prev_speaker)
+        #                           (0.3445, {0,1,2}, 0), where {0}-holds, {1}-shift, {2}-optional and 0 (in the last
+        #                           index means the user was speaking (true for all))
+        #   named_events.npy:     shifts, holds, vad based on the base annotations
+        save_shift_holds_labels()
