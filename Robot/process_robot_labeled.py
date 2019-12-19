@@ -3,9 +3,9 @@ Starting with `training_set_11Nov2014.zip` and `setup.zip` process the data to a
 We assume they are both located in SpechCorpus/Robot/data => $PWD/data
 1. unzip files to desired destination
 2. organize files appropriately
-3. extract vad, duration and timed_words
+3. extract vad, duration, events and timed_words
 """
-from os.path import join, basename, split, exists
+from os.path import join, basename, split, exists, abspath
 from os import system, listdir, makedirs
 from glob import glob
 import sys
@@ -14,7 +14,13 @@ import numpy as np
 from tqdm import tqdm
 from xml.dom import minidom
 
-from turntaking.utils import read_txt, read_wav, get_duration_sox
+from turntaking.utils import (
+    read_txt,
+    read_wav,
+    get_duration_sox,
+    list_percentage_to_onehot,
+)
+from turntaking.dataset.utils import load_vad  # load vad as during training
 
 
 def remove_created_dirs():
@@ -202,7 +208,7 @@ def save_shift_holds_labels(
 ):
     xml_root = "data/train_data/training_set"
 
-    for wav in listdir(audio_path):
+    for wav in tqdm(listdir(audio_path)):
         a = wav.split("_")
         name = "_".join(a[1:])
         n = name[-5]
@@ -215,6 +221,83 @@ def save_shift_holds_labels(
         nlp_session = join(nlp_path, wav.replace(".wav", ""))
         np.save(join(nlp_session, "events.npy"), events, allow_pickle=True)
         np.save(join(nlp_session, "events_named.npy"), events_named, allow_pickle=True)
+
+
+def sort_clean_dirty_events(
+    audio_path="data/training_set/audio",
+    nlp_path="data/training_set/nlp",
+    pre_event_dirty_time=0.2,
+):
+    """
+    Load all the events and the annotated vad. Check all events and sort out events when the robot is speaking
+    in the interval `pre_event_time` seconds before event to event.
+
+
+    If the robot is speaking these events are "dirty" and we must remove that part of the audio. Otherwise they are
+    cleaned and nothing needs to be done (in this step, we need to make sure there is pause time available afterwards etc).
+
+    Saves the sorted events to nlp_path.
+    """
+
+    # only relevant valued used when loading vad. Use small time_step to avoid rounding errors ?
+    hparams = {
+        "data": {"vad_path": "SpeechCorpus/Robot/data/training_set/nlp"},
+        "features": {"time_step": 0.01},
+    }
+
+    pre_horizon = round(pre_event_dirty_time / hparams["features"]["time_step"])
+
+    for wav in tqdm(listdir(audio_path)):
+        wav_path = abspath(join(audio_path, wav))
+        wav_name = wav.replace(".wav", "")
+        data = np.load(
+            join(nlp_path, wav_name, "events_named.npy"), allow_pickle=True
+        ).item()
+
+        # data
+        dur = get_duration_sox(wav_path)
+        frames = round(dur / hparams["features"]["time_step"])
+        vad = list_percentage_to_onehot(data["vad"], frames)
+        shifts_idx = (data["shifts"] * frames).round().astype(np.int)
+        holds_idx = (data["holds"] * frames).round().astype(np.int)
+
+        # Check if dirty: Robot is speaking during or `pre_horizon` prior to event
+        clean_shifts, dirty_shifts = [], []
+        for shift_frame, time in zip(shifts_idx, data["shifts"]):
+            s, e = shift_frame - pre_horizon, shift_frame
+            robo = vad[1, s:e]  # robot vad
+            if sum(robo) > 0:
+                dirty_shifts.append(time)
+            else:
+                clean_shifts.append(time)
+
+        clean_holds, dirty_holds = [], []
+        for shift_frame, time in zip(holds_idx, data["holds"]):
+            s, e = shift_frame - pre_horizon, shift_frame
+            robo = vad[1, s:e]  # robot vad
+            if sum(robo) > 0:
+                dirty_holds.append(time)
+            else:
+                clean_holds.append(time)
+
+        # Assert that all events are contained in clean/dirty
+        assert len(clean_shifts) + len(dirty_shifts) == len(shifts_idx)
+        assert len(clean_holds) + len(dirty_holds) == len(holds_idx)
+
+        # savepaths
+        clean_path = abspath(join(nlp_path, wav_name, "shifts_clean.npy"))
+        np.save(clean_path, clean_shifts, allow_pickle=True)
+
+        clean_path = abspath(join(nlp_path, wav_name, "holds_clean.npy"))
+        np.save(clean_path, clean_holds, allow_pickle=True)
+
+        if len(dirty_shifts) > 0:
+            dirty_path = abspath(join(nlp_path, wav_name, "shifts_dirty.npy"))
+            np.save(dirty_path, dirty_shifts, allow_pickle=True)
+
+        if len(dirty_holds) > 0:
+            dirty_path = abspath(join(nlp_path, wav_name, "holds_dirty.npy"))
+            np.save(dirty_path, dirty_holds, allow_pickle=True)
 
 
 def test():
@@ -255,6 +338,9 @@ if __name__ == "__main__":
         # Uses the aligned words from data/train_labeled_words.
         # Extracts vad, timed_words and words from these labels.
         # Uses 'sox' to extract duration in seconds.
+        print(
+            "Organizing folders (audio/nlp) and saving vad, timed_words, words and duration"
+        )
         organize_audio_and_nlp_data_train_set()
 
         # Looks in the original labels to find the labeled shift/hold events
@@ -264,4 +350,8 @@ if __name__ == "__main__":
         #                           (0.3445, {0,1,2}, 0), where {0}-holds, {1}-shift, {2}-optional and 0 (in the last
         #                           index means the user was speaking (true for all))
         #   named_events.npy:     shifts, holds, vad based on the base annotations
+        print("All events")
         save_shift_holds_labels()
+
+        print("Sort dirty and clean events")
+        sort_clean_dirty_events()
